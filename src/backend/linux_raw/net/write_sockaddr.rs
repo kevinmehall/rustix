@@ -4,7 +4,7 @@
 
 use crate::backend::c;
 #[cfg(target_os = "linux")]
-use crate::net::xdp::SocketAddrXdp;
+use crate::net::{netlink::SocketAddrNetlink, xdp::SocketAddrXdp};
 use crate::net::{SocketAddrAny, SocketAddrStorage, SocketAddrUnix, SocketAddrV4, SocketAddrV6};
 use core::mem::size_of;
 
@@ -18,6 +18,7 @@ pub(crate) unsafe fn write_sockaddr(
         SocketAddrAny::Unix(unix) => write_sockaddr_unix(unix, storage),
         #[cfg(target_os = "linux")]
         SocketAddrAny::Xdp(xdp) => write_sockaddr_xdp(xdp, storage),
+        SocketAddrAny::Netlink(nl) => write_sockaddr_nl(nl, storage),
     }
 }
 
@@ -79,4 +80,21 @@ unsafe fn write_sockaddr_xdp(xdp: &SocketAddrXdp, storage: *mut SocketAddrStorag
     let encoded = encode_sockaddr_xdp(xdp);
     core::ptr::write(storage.cast(), encoded);
     size_of::<c::sockaddr_xdp>()
+}
+
+#[cfg(target_os = "linux")]
+pub(crate) fn encode_sockaddr_nl(nl: &SocketAddrNetlink) -> c::sockaddr_nl {
+    c::sockaddr_nl {
+        nl_family: c::AF_NETLINK as _,
+        nl_pad: 0,
+        nl_pid: nl.pid(),
+        nl_groups: nl.groups(),
+    }
+}
+
+#[cfg(target_os = "linux")]
+unsafe fn write_sockaddr_nl(nl: &SocketAddrNetlink, storage: *mut SocketAddrStorage) -> usize {
+    let encoded = encode_sockaddr_nl(nl);
+    core::ptr::write(storage.cast(), encoded);
+    size_of::<c::sockaddr_nl>()
 }

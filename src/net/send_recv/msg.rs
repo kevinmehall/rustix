@@ -726,6 +726,24 @@ pub fn sendmsg_xdp(
     backend::net::syscalls::sendmsg_xdp(socket.as_fd(), addr, iov, control, flags)
 }
 
+/// `sendmsg(msghdr)`—Sends a message on a socket to a specific Netlink address.
+///
+/// # References
+///  - [Linux]
+///
+/// [Linux]: https://man7.org/linux/man-pages/man2/sendmsg.2.html
+#[inline]
+#[cfg(target_os = "linux")]
+pub fn sendmsg_netlink(
+    socket: impl AsFd,
+    addr: &super::SocketAddrNetlink,
+    iov: &[IoSlice<'_>],
+    control: &mut SendAncillaryBuffer<'_, '_, '_>,
+    flags: SendFlags,
+) -> io::Result<usize> {
+    backend::net::syscalls::sendmsg_netlink(socket.as_fd(), addr, iov, control, flags)
+}
+
 /// `sendmsg(msghdr)`—Sends a message on a socket to a specific address.
 ///
 /// # References
@@ -769,6 +787,10 @@ pub fn sendmsg_any(
         #[cfg(target_os = "linux")]
         Some(SocketAddrAny::Xdp(addr)) => {
             backend::net::syscalls::sendmsg_xdp(socket.as_fd(), addr, iov, control, flags)
+        }
+        #[cfg(target_os = "linux")]
+        Some(SocketAddrAny::Netlink(addr)) => {
+            backend::net::syscalls::sendmsg_netlink(socket.as_fd(), addr, iov, control, flags)
         }
     }
 }
