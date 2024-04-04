@@ -19,6 +19,7 @@ use crate::{backend, io};
 #[cfg(feature = "std")]
 use core::fmt;
 use core::mem;
+use core::ptr::copy_nonoverlapping;
 
 pub use backend::net::addr::SocketAddrStorage;
 
@@ -101,16 +102,12 @@ impl SocketAddrAny {
     /// `storage` must point to valid memory for encoding the socket
     /// address.
     pub unsafe fn write(&self, storage: *mut SocketAddrStorage) -> usize {
-        match self {
-            SocketAddrAny::V4(a) => a.write_sockaddr(storage),
-            SocketAddrAny::V6(a) => a.write_sockaddr(storage),
-            #[cfg(unix)]
-            SocketAddrAny::Unix(a) => a.write_sockaddr(storage),
-            #[cfg(target_os = "linux")]
-            SocketAddrAny::Xdp(a) => a.write_sockaddr(storage),
-            #[cfg(target_os = "linux")]
-            SocketAddrAny::Netlink(a) => a.write_sockaddr(storage),
-        }
+        self.with_sockaddr(|addr, len| {
+            unsafe {
+                copy_nonoverlapping(addr.cast::<u8>(), storage.cast::<u8>(), len as usize);
+            }
+            len as usize
+        })
     }
 
     /// Reads a platform-specific encoding of a socket address from
@@ -150,10 +147,6 @@ unsafe impl SocketAddress for SocketAddrAny {
             self.write((&mut storage as *mut c::sockaddr_storage).cast());
             storage
         }
-    }
-
-    unsafe fn write_sockaddr(&self, storage: *mut SocketAddrStorage) -> usize {
-        self.write(storage)
     }
 
     fn with_sockaddr<R>(

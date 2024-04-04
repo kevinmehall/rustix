@@ -229,11 +229,6 @@ unsafe impl SocketAddress for SocketAddrUnix {
         self.unix
     }
 
-    unsafe fn write_sockaddr(&self, storage: *mut SocketAddrStorage) -> usize {
-        core::ptr::write(storage.cast(), self.unix);
-        self.len()
-    }
-
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const c::sockaddr, c::socklen_t) -> R) -> R {
         f(
             (&self.unix as *const c::sockaddr_un).cast(),
