@@ -4,6 +4,8 @@ use core::mem::{self, size_of};
 use crate::backend::c;
 use crate::net::SocketAddr;
 
+use super::SocketAddrUnix;
+
 /// A trait abstracting over the types that can be passed as a `sockaddr`.
 ///
 /// Safety: by implementing this trait, you assert that the values returned
@@ -54,5 +56,21 @@ unsafe impl SocketAddress for super::SocketAddr {
             SocketAddr::V4(v4) => v4.with_sockaddr(f),
             SocketAddr::V6(v6) => v6.with_sockaddr(f),
         }
+    }
+}
+
+#[cfg(unix)]
+unsafe impl SocketAddress for SocketAddrUnix {
+    type CSockAddr = c::sockaddr_un;
+
+    fn encode(&self) -> Self::CSockAddr {
+        self.unix
+    }
+
+    fn with_sockaddr<R>(&self, f: impl FnOnce(*const c::sockaddr, c::socklen_t) -> R) -> R {
+        f(
+            (&self.unix as *const c::sockaddr_un).cast(),
+            self.addr_len(),
+        )
     }
 }

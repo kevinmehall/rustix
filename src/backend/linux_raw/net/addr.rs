@@ -197,18 +197,6 @@ impl fmt::Debug for SocketAddrUnix {
     }
 }
 
-unsafe impl SocketAddress for SocketAddrUnix {
-    type CSockAddr = c::sockaddr_un;
-
-    fn encode(&self) -> Self::CSockAddr {
-        self.unix
-    }
-
-    fn with_sockaddr<R>(&self, f: impl FnOnce(*const c::sockaddr, c::socklen_t) -> R) -> R {
-        f((&self.unix as *const c::sockaddr_un).cast(), self.len)
-    }
-}
-
 /// `struct sockaddr_storage` as a raw struct.
 pub type SocketAddrStorage = c::sockaddr;
 
