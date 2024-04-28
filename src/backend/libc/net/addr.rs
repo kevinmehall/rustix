@@ -12,9 +12,6 @@ use {
     core::slice,
 };
 
-use super::write_sockaddr::{encode_sockaddr_v4, encode_sockaddr_v6};
-use crate::net::{SocketAddrV4, SocketAddrV6, SocketAddress};
-
 /// `struct sockaddr_un`
 #[cfg(unix)]
 #[derive(Clone)]

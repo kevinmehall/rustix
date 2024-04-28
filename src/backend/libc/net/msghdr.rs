@@ -70,7 +70,7 @@ pub(crate) fn with_msghdr<R>(
     addr.with_sockaddr(|addr_ptr, addr_len| {
         f({
             let mut h = zero_msghdr();
-            h.msg_name = addr_ptr.cast_mut().cast();
+            h.msg_name = addr_ptr as *mut _;
             h.msg_namelen = addr_len;
             h.msg_iov = iov.as_ptr() as _;
             h.msg_iovlen = msg_iov_len(iov.len());

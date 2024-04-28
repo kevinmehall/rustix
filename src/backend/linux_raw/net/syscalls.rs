@@ -426,7 +426,7 @@ pub(crate) fn sendto(
                 buf_addr,
                 buf_len,
                 flags,
-                raw_arg(addr_ptr.cast_mut().cast()),
+                raw_arg(addr_ptr as *mut _),
                 socklen_t(addr_len)
             ))
         }
@@ -440,7 +440,7 @@ pub(crate) fn sendto(
                     buf_addr,
                     buf_len,
                     flags.into(),
-                    raw_arg(addr_ptr.cast_mut().cast()),
+                    raw_arg(addr_ptr as *mut _),
                     socklen_t(addr_len)
                 ])
             ))
@@ -626,7 +626,7 @@ pub(crate) fn bind(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<
             ret(syscall_readonly!(
                 __NR_bind,
                 fd,
-                raw_arg(addr_ptr.cast_mut().cast()),
+                raw_arg(addr_ptr as *mut _),
                 socklen_t(addr_len)
             ))
         }
@@ -637,7 +637,7 @@ pub(crate) fn bind(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<
                 x86_sys(SYS_BIND),
                 slice_just_addr::<ArgReg<'_, SocketArg>, _>(&[
                     fd.into(),
-                    raw_arg(addr_ptr.cast_mut().cast()),
+                    raw_arg(addr_ptr as *mut _),
                     socklen_t(addr_len)
                 ])
             ))
@@ -653,7 +653,7 @@ pub(crate) fn connect(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Resu
             ret(syscall_readonly!(
                 __NR_connect,
                 fd,
-                raw_arg(addr_ptr.cast_mut().cast()),
+                raw_arg(addr_ptr as *mut _),
                 socklen_t(addr_len)
             ))
         }
@@ -664,7 +664,7 @@ pub(crate) fn connect(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Resu
                 x86_sys(SYS_CONNECT),
                 slice_just_addr::<ArgReg<'_, SocketArg>, _>(&[
                     fd.into(),
-                    raw_arg(addr_ptr.cast_mut().cast()),
+                    raw_arg(addr_ptr as *mut _),
                     socklen_t(addr_len)
                 ])
             ))
