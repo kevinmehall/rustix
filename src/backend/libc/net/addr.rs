@@ -15,22 +15,6 @@ use {
 use super::write_sockaddr::{encode_sockaddr_v4, encode_sockaddr_v6};
 use crate::net::{SocketAddrV4, SocketAddrV6, SocketAddress};
 
-unsafe impl SocketAddress for SocketAddrV4 {
-    type CSockAddr = c::sockaddr_in;
-
-    fn encode(&self) -> Self::CSockAddr {
-        encode_sockaddr_v4(self)
-    }
-}
-
-unsafe impl SocketAddress for SocketAddrV6 {
-    type CSockAddr = c::sockaddr_in6;
-
-    fn encode(&self) -> Self::CSockAddr {
-        encode_sockaddr_v6(self)
-    }
-}
-
 /// `struct sockaddr_un`
 #[cfg(unix)]
 #[derive(Clone)]

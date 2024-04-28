@@ -8,44 +8,10 @@
 
 use crate::backend::c;
 use crate::ffi::CStr;
-use crate::net::{SocketAddrV4, SocketAddrV6, SocketAddress};
 use crate::{io, path};
 use core::cmp::Ordering;
 use core::hash::{Hash, Hasher};
 use core::{fmt, slice};
-
-unsafe impl SocketAddress for SocketAddrV4 {
-    type CSockAddr = c::sockaddr_in;
-
-    fn encode(&self) -> Self::CSockAddr {
-        c::sockaddr_in {
-            sin_family: c::AF_INET as _,
-            sin_port: u16::to_be(self.port()),
-            sin_addr: c::in_addr {
-                s_addr: u32::from_ne_bytes(self.ip().octets()),
-            },
-            __pad: [0_u8; 8],
-        }
-    }
-}
-
-unsafe impl SocketAddress for SocketAddrV6 {
-    type CSockAddr = c::sockaddr_in6;
-
-    fn encode(&self) -> Self::CSockAddr {
-        c::sockaddr_in6 {
-            sin6_family: c::AF_INET6 as _,
-            sin6_port: u16::to_be(self.port()),
-            sin6_flowinfo: u32::to_be(self.flowinfo()),
-            sin6_addr: c::in6_addr {
-                in6_u: linux_raw_sys::net::in6_addr__bindgen_ty_1 {
-                    u6_addr8: self.ip().octets(),
-                },
-            },
-            sin6_scope_id: self.scope_id(),
-        }
-    }
-}
 
 /// `struct sockaddr_un`
 #[derive(Clone)]
