@@ -86,11 +86,11 @@ pub(crate) unsafe fn recvfrom(
 }
 
 #[cfg(not(any(target_os = "redox", target_os = "wasi")))]
-pub(crate) fn sendto<A: SocketAddress>(
+pub(crate) fn sendto(
     fd: BorrowedFd<'_>,
     buf: &[u8],
     flags: SendFlags,
-    addr: &A,
+    addr: &impl SocketAddress,
 ) -> io::Result<usize> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
@@ -146,7 +146,7 @@ pub(crate) fn socket_with(
 }
 
 #[cfg(not(any(target_os = "redox", target_os = "wasi")))]
-pub(crate) fn bind<A: SocketAddress>(sockfd: BorrowedFd<'_>, addr: &A) -> io::Result<()> {
+pub(crate) fn bind(sockfd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
             ret(c::bind(borrowed_fd(sockfd), addr_ptr, addr_len))
@@ -155,7 +155,7 @@ pub(crate) fn bind<A: SocketAddress>(sockfd: BorrowedFd<'_>, addr: &A) -> io::Re
 }
 
 #[cfg(not(any(target_os = "redox", target_os = "wasi")))]
-pub(crate) fn connect<A: SocketAddress>(sockfd: BorrowedFd<'_>, addr: &A) -> io::Result<()> {
+pub(crate) fn connect(sockfd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
             ret(c::connect(borrowed_fd(sockfd), addr_ptr, addr_len))
@@ -256,9 +256,9 @@ pub(crate) fn sendmsg(
     target_os = "vita",
     target_os = "wasi"
 )))]
-pub(crate) fn sendmsg_addr<A: SocketAddress>(
+pub(crate) fn sendmsg_addr(
     sockfd: BorrowedFd<'_>,
-    addr: &A,
+    addr: &impl SocketAddress,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     msg_flags: SendFlags,

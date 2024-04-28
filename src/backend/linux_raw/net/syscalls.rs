@@ -311,9 +311,9 @@ pub(crate) fn sendmsg(
 }
 
 #[inline]
-pub(crate) fn sendmsg_addr<A: SocketAddress>(
+pub(crate) fn sendmsg_addr(
     sockfd: BorrowedFd<'_>,
-    addr: &A,
+    addr: &impl SocketAddress,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     msg_flags: SendFlags,
@@ -409,11 +409,11 @@ pub(crate) fn send(fd: BorrowedFd<'_>, buf: &[u8], flags: SendFlags) -> io::Resu
 }
 
 #[inline]
-pub(crate) fn sendto<A: SocketAddress>(
+pub(crate) fn sendto(
     fd: BorrowedFd<'_>,
     buf: &[u8],
     flags: SendFlags,
-    addr: &A,
+    addr: &impl SocketAddress,
 ) -> io::Result<usize> {
     let (buf_addr, buf_len) = slice(buf);
 
@@ -619,7 +619,7 @@ pub(crate) fn getsockname(fd: BorrowedFd<'_>) -> io::Result<SocketAddrAny> {
 }
 
 #[inline]
-pub(crate) fn bind<A: SocketAddress>(fd: BorrowedFd<'_>, addr: &A) -> io::Result<()> {
+pub(crate) fn bind(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
     addr.with_sockaddr(|addr_ptr, addr_len| {
         #[cfg(not(target_arch = "x86"))]
         unsafe {
@@ -646,7 +646,7 @@ pub(crate) fn bind<A: SocketAddress>(fd: BorrowedFd<'_>, addr: &A) -> io::Result
 }
 
 #[inline]
-pub(crate) fn connect<A: SocketAddress>(fd: BorrowedFd<'_>, addr: &A) -> io::Result<()> {
+pub(crate) fn connect(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
     addr.with_sockaddr(|addr_ptr, addr_len| {
         #[cfg(not(target_arch = "x86"))]
         unsafe {

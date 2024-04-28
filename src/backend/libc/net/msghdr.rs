@@ -61,8 +61,8 @@ pub(crate) fn with_noaddr_msghdr<R>(
 }
 
 /// Create a message header intended to send with the specified address.
-pub(crate) fn with_msghdr<R, A: SocketAddress>(
-    addr: &A,
+pub(crate) fn with_msghdr<R>(
+    addr: &impl SocketAddress,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     f: impl FnOnce(c::msghdr) -> R,

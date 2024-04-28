@@ -197,11 +197,11 @@ pub fn recvfrom_uninit<Fd: AsFd>(
 /// [DragonFly BSD]: https://man.dragonflybsd.org/?command=sendto&section=2
 /// [illumos]: https://illumos.org/man/3SOCKET/sendto
 /// [glibc]: https://www.gnu.org/software/libc/manual/html_node/Sending-Datagrams.html
-pub fn sendto<Fd: AsFd, A: SocketAddress>(
+pub fn sendto<Fd: AsFd>(
     fd: Fd,
     buf: &[u8],
     flags: SendFlags,
-    addr: &A,
+    addr: &impl SocketAddress,
 ) -> io::Result<usize> {
     backend::net::syscalls::sendto(fd.as_fd(), buf, flags, addr)
 }

@@ -641,9 +641,9 @@ pub fn sendmsg(
 /// [DragonFly BSD]: https://man.dragonflybsd.org/?command=sendmsg&section=2
 /// [illumos]: https://illumos.org/man/3SOCKET/sendmsg
 #[inline]
-pub fn sendmsg_addr<A: SocketAddress>(
+pub fn sendmsg_addr(
     socket: impl AsFd,
-    addr: &A,
+    addr: &impl SocketAddress,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     flags: SendFlags,
