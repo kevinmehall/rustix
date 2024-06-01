@@ -9,21 +9,17 @@
 //! OS-specific socket address representations in memory.
 #![allow(unsafe_code)]
 
-use crate::backend::c;
 #[cfg(unix)]
 use crate::net::SocketAddrUnix;
 #[cfg(target_os = "linux")]
 use crate::net::{netlink::SocketAddrNetlink, xdp::SocketAddrXdp};
-use crate::net::{AddressFamily, SocketAddr, SocketAddrV4, SocketAddrV6};
+use crate::net::{AddressFamily, SocketAddr, SocketAddress, SockAddrRaw, SocketAddrV4, SocketAddrV6};
 use crate::{backend, io};
 #[cfg(feature = "std")]
 use core::fmt;
-use core::mem;
 use core::ptr::copy_nonoverlapping;
 
 pub use backend::net::addr::SocketAddrStorage;
-
-use super::SocketAddress;
 
 /// `struct sockaddr_storage` as a Rust enum.
 #[derive(Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
@@ -139,19 +135,9 @@ impl fmt::Debug for SocketAddrAny {
 }
 
 unsafe impl SocketAddress for SocketAddrAny {
-    type CSockAddr = c::sockaddr_storage;
-
-    fn encode(&self) -> Self::CSockAddr {
-        unsafe {
-            let mut storage: c::sockaddr_storage = mem::zeroed();
-            self.write((&mut storage as *mut c::sockaddr_storage).cast());
-            storage
-        }
-    }
-
     fn with_sockaddr<R>(
         &self,
-        f: impl FnOnce(*const backend::c::sockaddr, backend::c::socklen_t) -> R,
+        f: impl FnOnce(*const SockAddrRaw, usize) -> R,
     ) -> R {
         match self {
             Self::V4(a) => a.with_sockaddr(f),

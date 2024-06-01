@@ -427,7 +427,7 @@ pub(crate) fn sendto(
                 buf_len,
                 flags,
                 raw_arg(addr_ptr as *mut _),
-                socklen_t(addr_len)
+                socklen_t(addr_len as socklen_t)
             ))
         }
         #[cfg(target_arch = "x86")]
@@ -441,7 +441,7 @@ pub(crate) fn sendto(
                     buf_len,
                     flags.into(),
                     raw_arg(addr_ptr as *mut _),
-                    socklen_t(addr_len)
+                    socklen_t(addr_len as socklen_t)
                 ])
             ))
         }
@@ -627,7 +627,7 @@ pub(crate) fn bind(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<
                 __NR_bind,
                 fd,
                 raw_arg(addr_ptr as *mut _),
-                socklen_t(addr_len)
+                socklen_t(addr_len as socklen_t)
             ))
         }
         #[cfg(target_arch = "x86")]
@@ -638,7 +638,7 @@ pub(crate) fn bind(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<
                 slice_just_addr::<ArgReg<'_, SocketArg>, _>(&[
                     fd.into(),
                     raw_arg(addr_ptr as *mut _),
-                    socklen_t(addr_len)
+                    socklen_t(addr_len as socklen_t)
                 ])
             ))
         }
@@ -654,7 +654,7 @@ pub(crate) fn connect(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Resu
                 __NR_connect,
                 fd,
                 raw_arg(addr_ptr as *mut _),
-                socklen_t(addr_len)
+                socklen_t(addr_len as socklen_t)
             ))
         }
         #[cfg(target_arch = "x86")]
@@ -665,7 +665,7 @@ pub(crate) fn connect(fd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Resu
                 slice_just_addr::<ArgReg<'_, SocketArg>, _>(&[
                     fd.into(),
                     raw_arg(addr_ptr as *mut _),
-                    socklen_t(addr_len)
+                    socklen_t(addr_len as socklen_t)
                 ])
             ))
         }
