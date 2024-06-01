@@ -5,7 +5,7 @@
 use crate::backend::{self, c};
 use crate::fd::{AsFd, BorrowedFd, OwnedFd};
 use crate::io::{self, IoSlice, IoSliceMut};
-use crate::net::SocketAddress;
+use crate::net::SockAddr;
 #[cfg(linux_kernel)]
 use crate::net::UCred;
 
@@ -643,7 +643,7 @@ pub fn sendmsg(
 #[inline]
 pub fn sendmsg_addr(
     socket: impl AsFd,
-    addr: &impl SocketAddress,
+    addr: &impl SockAddr,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     flags: SendFlags,

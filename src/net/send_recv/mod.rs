@@ -32,7 +32,7 @@ mod msg;
 )))]
 pub use msg::*;
 
-use super::SocketAddress;
+use super::SockAddr;
 
 /// `recv(fd, buf, flags)`—Reads data from a socket.
 ///
@@ -201,7 +201,7 @@ pub fn sendto<Fd: AsFd>(
     fd: Fd,
     buf: &[u8],
     flags: SendFlags,
-    addr: &impl SocketAddress,
+    addr: &impl SockAddr,
 ) -> io::Result<usize> {
     backend::net::syscalls::sendto(fd.as_fd(), buf, flags, addr)
 }

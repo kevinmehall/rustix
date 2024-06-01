@@ -8,7 +8,7 @@
 use crate::backend::c;
 
 use crate::io::{self, IoSlice, IoSliceMut};
-use crate::net::{RecvAncillaryBuffer, SendAncillaryBuffer, SocketAddress};
+use crate::net::{RecvAncillaryBuffer, SendAncillaryBuffer, SockAddr};
 
 use core::mem::{size_of, MaybeUninit};
 use core::ptr::null_mut;
@@ -74,7 +74,7 @@ pub(crate) fn with_noaddr_msghdr<R>(
 
 /// Create a message header intended to send with the specified address
 pub(crate) fn with_msghdr<R>(
-    addr: &impl SocketAddress,
+    addr: &impl SockAddr,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     f: impl FnOnce(c::msghdr) -> R,

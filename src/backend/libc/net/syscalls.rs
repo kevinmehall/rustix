@@ -4,7 +4,7 @@ use crate::backend::c;
 use crate::backend::conv::{borrowed_fd, ret, ret_owned_fd, ret_send_recv, send_recv_len};
 use crate::fd::{BorrowedFd, OwnedFd};
 use crate::io;
-use crate::net::{SocketAddrAny, SocketAddress};
+use crate::net::{SocketAddrAny, SockAddr};
 use crate::utils::as_ptr;
 use core::mem::{size_of, MaybeUninit};
 #[cfg(not(any(
@@ -90,7 +90,7 @@ pub(crate) fn sendto(
     fd: BorrowedFd<'_>,
     buf: &[u8],
     flags: SendFlags,
-    addr: &impl SocketAddress,
+    addr: &impl SockAddr,
 ) -> io::Result<usize> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
@@ -146,7 +146,7 @@ pub(crate) fn socket_with(
 }
 
 #[cfg(not(any(target_os = "redox", target_os = "wasi")))]
-pub(crate) fn bind(sockfd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
+pub(crate) fn bind(sockfd: BorrowedFd<'_>, addr: &impl SockAddr) -> io::Result<()> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
             ret(c::bind(borrowed_fd(sockfd), addr_ptr.cast(), addr_len as c::socklen_t))
@@ -155,7 +155,7 @@ pub(crate) fn bind(sockfd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Res
 }
 
 #[cfg(not(any(target_os = "redox", target_os = "wasi")))]
-pub(crate) fn connect(sockfd: BorrowedFd<'_>, addr: &impl SocketAddress) -> io::Result<()> {
+pub(crate) fn connect(sockfd: BorrowedFd<'_>, addr: &impl SockAddr) -> io::Result<()> {
     unsafe {
         addr.with_sockaddr(|addr_ptr, addr_len| {
             ret(c::connect(borrowed_fd(sockfd), addr_ptr.cast(), addr_len as c::socklen_t))
@@ -258,7 +258,7 @@ pub(crate) fn sendmsg(
 )))]
 pub(crate) fn sendmsg_addr(
     sockfd: BorrowedFd<'_>,
-    addr: &impl SocketAddress,
+    addr: &impl SockAddr,
     iov: &[IoSlice<'_>],
     control: &mut SendAncillaryBuffer<'_, '_, '_>,
     msg_flags: SendFlags,

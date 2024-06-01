@@ -915,7 +915,7 @@ pub mod netlink {
     use {
         super::{new_raw_protocol, Protocol},
         crate::backend::c,
-        crate::net::{SocketAddress, SockAddrRaw, socket_address::call_with_sockaddr},
+        crate::net::{SockAddr, SockAddrRaw, socket_address::call_with_sockaddr},
         core::mem,
     };
 
@@ -1077,7 +1077,7 @@ pub mod netlink {
 
     #[cfg(linux_kernel)]
     #[allow(unsafe_code)]
-    unsafe impl SocketAddress for SocketAddrNetlink {
+    unsafe impl SockAddr for SocketAddrNetlink {
         fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
             let mut addr: c::sockaddr_nl = unsafe { mem::zeroed() };
             addr.nl_family = c::AF_NETLINK as _;
@@ -1513,7 +1513,7 @@ bitflags! {
 /// `AF_XDP` related types and constants.
 #[cfg(target_os = "linux")]
 pub mod xdp {
-    use crate::net::{socket_address::call_with_sockaddr, SockAddrRaw, SocketAddress};
+    use crate::net::{socket_address::call_with_sockaddr, SockAddrRaw, SockAddr};
 
     use super::{bitflags, c};
 
@@ -1655,7 +1655,7 @@ pub mod xdp {
     }
 
     #[allow(unsafe_code)]
-    unsafe impl SocketAddress for SocketAddrXdp {
+    unsafe impl SockAddr for SocketAddrXdp {
         fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
             let addr = c::sockaddr_xdp {
                 sxdp_family: c::AF_XDP as _,

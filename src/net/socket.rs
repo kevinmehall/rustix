@@ -9,7 +9,7 @@ pub use crate::net::{AddressFamily, Protocol, Shutdown, SocketFlags, SocketType}
 #[cfg(unix)]
 pub use backend::net::addr::SocketAddrUnix;
 
-use super::SocketAddress;
+use super::SockAddr;
 
 /// `socket(domain, type_, protocol)`—Creates a socket.
 ///
@@ -124,7 +124,7 @@ pub fn socket_with(
 /// [DragonFly BSD]: https://man.dragonflybsd.org/?command=bind&section=2
 /// [illumos]: https://illumos.org/man/3SOCKET/bind
 /// [glibc]: https://www.gnu.org/software/libc/manual/html_node/Setting-Address.html
-pub fn bind<Fd: AsFd>(sockfd: Fd, addr: &impl SocketAddress) -> io::Result<()> {
+pub fn bind<Fd: AsFd>(sockfd: Fd, addr: &impl SockAddr) -> io::Result<()> {
     backend::net::syscalls::bind(sockfd.as_fd(), addr)
 }
 
@@ -303,7 +303,7 @@ pub fn bind_xdp<Fd: AsFd>(sockfd: Fd, addr: &SocketAddrXdp) -> io::Result<()> {
 /// [illumos]: https://illumos.org/man/3SOCKET/connect
 /// [glibc]: https://www.gnu.org/software/libc/manual/html_node/Connecting.html
 /// [`Errno::WOULDBLOCK`]: io::Errno::WOULDBLOCK
-pub fn connect<Fd: AsFd>(sockfd: Fd, addr: &impl SocketAddress) -> io::Result<()> {
+pub fn connect<Fd: AsFd>(sockfd: Fd, addr: &impl SockAddr) -> io::Result<()> {
     backend::net::syscalls::connect(sockfd.as_fd(), addr)
 }
 

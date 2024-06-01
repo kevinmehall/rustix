@@ -27,7 +27,7 @@ pub struct SockAddrRaw {
 /// `f` with a pointer that is readable for the passed length, and points
 /// to data that is a valid socket address for the system calls that accept
 /// `sockaddr` as a const pointer.
-pub unsafe trait SocketAddress {
+pub unsafe trait SockAddr {
     /// Call a closure with the pointer and length to the corresponding C type.
     ///
     /// The API uses a closure so that:
@@ -39,14 +39,14 @@ pub unsafe trait SocketAddress {
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R;
 }
 
-/// Helper for implementing SocketAddress::with_sockaddr
+/// Helper for implementing SockAddr::with_sockaddr
 pub(crate) fn call_with_sockaddr<A, R>(addr: &A, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
     let ptr = (addr as *const A).cast();
     let len = size_of::<A>();
     f(ptr, len)
 }
 
-unsafe impl SocketAddress for super::SocketAddr {
+unsafe impl SockAddr for super::SocketAddr {
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
         match self {
             SocketAddr::V4(v4) => v4.with_sockaddr(f),
@@ -55,20 +55,20 @@ unsafe impl SocketAddress for super::SocketAddr {
     }
 }
 
-unsafe impl SocketAddress for SocketAddrV4 {
+unsafe impl SockAddr for SocketAddrV4 {
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
         call_with_sockaddr(&encode_sockaddr_v4(self), f)
     }
 }
 
-unsafe impl SocketAddress for SocketAddrV6 {
+unsafe impl SockAddr for SocketAddrV6 {
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
         call_with_sockaddr(&encode_sockaddr_v6(self), f)
     }
 }
 
 #[cfg(unix)]
-unsafe impl SocketAddress for SocketAddrUnix {
+unsafe impl SockAddr for SocketAddrUnix {
     fn with_sockaddr<R>(&self, f: impl FnOnce(*const SockAddrRaw, usize) -> R) -> R {
         f(
             (&self.unix as *const c::sockaddr_un).cast(),

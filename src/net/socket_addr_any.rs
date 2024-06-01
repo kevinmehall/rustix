@@ -13,7 +13,7 @@
 use crate::net::SocketAddrUnix;
 #[cfg(target_os = "linux")]
 use crate::net::{netlink::SocketAddrNetlink, xdp::SocketAddrXdp};
-use crate::net::{AddressFamily, SocketAddr, SocketAddress, SockAddrRaw, SocketAddrV4, SocketAddrV6};
+use crate::net::{AddressFamily, SocketAddr, SockAddr, SockAddrRaw, SocketAddrV4, SocketAddrV6};
 use crate::{backend, io};
 #[cfg(feature = "std")]
 use core::fmt;
@@ -134,7 +134,7 @@ impl fmt::Debug for SocketAddrAny {
     }
 }
 
-unsafe impl SocketAddress for SocketAddrAny {
+unsafe impl SockAddr for SocketAddrAny {
     fn with_sockaddr<R>(
         &self,
         f: impl FnOnce(*const SockAddrRaw, usize) -> R,
